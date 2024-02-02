@@ -1,0 +1,43 @@
+name: portable-release-actions-workflow
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+permissions:
+    contents: write    
+    
+jobs:
+  build:
+    name: Create Release
+    runs-on: windows-latest
+    env:
+      targetZip: medieval-cue-splitter-portable-${{ github.ref_name }}.zip
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: installer
+        shell: cmd
+        run: |
+          curl https://www.medieval.it/sw/cuesplitter_setup.exe -L -O
+          
+      - shell: cmd
+        run: |
+          set __COMPAT_LAYER=RUNASINVOKER && .\cuesplitter_setup.exe /extract /quiet &&^
+          del E8B158F\cuesplitter.msi &&^
+          dir
+          
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          directory: "E8B158F"
+          filename: "${{ env.targetZip }}"
+          
+      - name: Release prebuilt
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "E8B158F/${{ env.targetZip }}"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
