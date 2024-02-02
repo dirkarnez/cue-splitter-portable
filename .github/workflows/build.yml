@@ -29,7 +29,7 @@ jobs:
           dir
           
       - shell: cmd
-        run: xcopy /H /Y /C " CUE_Splitter.exe.Portable.cmd" "E8B158F"
+        run: xcopy /H /Y /C "CUE_Splitter.exe.Portable.cmd" "E8B158F"
         
       - name: Archive Release
         uses: thedoctor0/zip-release@master
